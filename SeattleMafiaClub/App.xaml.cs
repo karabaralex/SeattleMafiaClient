@@ -1,5 +1,5 @@
 ﻿using System;
-
+using SeattleMafiaClub.Views;
 using Xamarin.Forms;
 
 namespace SeattleMafiaClub
@@ -19,9 +19,9 @@ namespace SeattleMafiaClub
                 DependencyService.Register<CloudDataStore>();
 
             if (Device.RuntimePlatform == Device.iOS)
-                MainPage = new MainPage();
+                MainPage = new NavigationPage(new LoginPage());
             else
-                MainPage = new NavigationPage(new MainPage());
+                MainPage = new NavigationPage(new LoginPage());
         }
     }
 }

@@ -24,18 +24,10 @@ namespace SeattleMafiaClub
             if (item == null)
                 return;
 
-            //await Navigation.PushAsync(new ItemDetailPage(new ItemDetailViewModel(item)));
+            await Navigation.PushAsync(new ItemDetailPage(new ItemDetailViewModel(item)));
 
             //// Manually deselect item
-            //ItemsListView.SelectedItem = null;
-
-
-            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-            presenter.Login(AuthService.getInstance().authenticator);
-            AuthService.getInstance().OnCompletedListener = (result) => 
-            {
-                Navigation.PopAsync();
-            };
+            ItemsListView.SelectedItem = null;
         }
 
         async void AddItem_Clicked(object sender, EventArgs e)

@@ -1,5 +1,5 @@
 ﻿using System;
-
+using SeattleMafiaClub.Services;
 using Xamarin.Forms;
 
 namespace SeattleMafiaClub
@@ -8,8 +8,16 @@ namespace SeattleMafiaClub
     {
         public MainPage()
         {
-            Page itemsPage, aboutPage = null;
+            //Button button = new Button
+            //{
+            //    Text = "Hello, Forms!",
+            //    VerticalOptions = LayoutOptions.CenterAndExpand,
+            //    HorizontalOptions = LayoutOptions.CenterAndExpand,
+            //};
 
+            //button.Clicked += (sender, e) => query();
+            //Content = button;
+            Page itemsPage, aboutPage = null;
             switch (Device.RuntimePlatform)
             {
                 case Device.iOS:
@@ -44,10 +52,16 @@ namespace SeattleMafiaClub
             Title = Children[0].Title;
         }
 
-        protected override void OnCurrentPageChanged()
+        //protected override void OnCurrentPageChanged()
+        //{
+        //    base.OnCurrentPageChanged();
+        //    Title = CurrentPage?.Title ?? string.Empty;
+        //}
+
+        protected override void OnAppearing()
         {
-            base.OnCurrentPageChanged();
-            Title = CurrentPage?.Title ?? string.Empty;
+            base.OnAppearing();
+            //Navigation.PushAsync(new ItemsPage());
         }
     }
 }
