@@ -15,7 +15,7 @@ namespace SeattleMafiaClub
 
             var item = new Item
             {
-                Text = "Item 1",
+                Status = "Item 1",
                 Description = "This is an item description."
             };
 

@@ -112,6 +112,14 @@ namespace SeattleMafiaClub.Services
             });
         }
 
+        internal string getToken()
+        {
+            Xamarin.Auth.Account account = getFacebookToken();
+            if (account == null)
+                return null;
+            return account.Properties["access_token"];
+        }
+
         private Xamarin.Auth.Account getFacebookToken()
         {
             Xamarin.Auth.Account a = new Xamarin.Auth.Account();

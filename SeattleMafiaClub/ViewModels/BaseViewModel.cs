@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-
+using SeattleMafiaClub.Services;
 using Xamarin.Forms;
 
 namespace SeattleMafiaClub
 {
     public class BaseViewModel : INotifyPropertyChanged
     {
-        public IDataStore<Item> DataStore => DependencyService.Get<IDataStore<Item>>() ?? new MockDataStore();
+        public CloudDataStore DataStore => new CloudDataStore();
 
         bool isBusy = false;
         public bool IsBusy
