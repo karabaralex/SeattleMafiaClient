@@ -11,25 +11,26 @@ using SeattleMafiaClub.Services;
 
 namespace SeattleMafiaClub.Droid
 {
-    [Activity(Label = "CustomUrlSchemeInterceptorActivity", NoHistory = true, LaunchMode = LaunchMode.SingleTop)]
-    [IntentFilter(
-        new[] { Intent.ActionView },
-        Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
-        DataSchemes = new[] { "<insert custom URL here>" },
-        DataPath = "/oauth2redirect")]
-    public class CustomUrlSchemeInterceptorActivity : Activity
-    {
-        protected override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
+    //[Activity(Label = "CustomUrlSchemeInterceptorActivity", NoHistory = true, LaunchMode = LaunchMode.SingleTop)]
+    //[IntentFilter(
+    //    new[] { Intent.ActionView },
+    //    Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
+    //    DataSchemes = new[] { "http://com.seattlemafiaclub.SeattleMafiaClub" },
+    //    DataPath = "/oauth2redirect")]
+    //public class CustomUrlSchemeInterceptorActivity : Activity
+    //{
+    //    //DataPath = "/oauth2redirect"
+    //    protected override void OnCreate(Bundle savedInstanceState)
+    //    {
+    //        base.OnCreate(savedInstanceState);
 
-            // Convert Android.Net.Url to Uri
-            var uri = new Uri(Intent.Data.ToString());
+    //        // Convert Android.Net.Url to Uri
+    //        var uri = new Uri(Intent.Data.ToString());
 
-            // Load redirectUrl page
-            AuthService.getInstance().authenticator.OnPageLoading(uri);
+    //        // Load redirectUrl page
+    //        AuthService.getInstance().authenticator.OnPageLoading(uri);
 
-            Finish();
-        }
-    }
+    //        Finish();
+    //    }
+    //}
 }

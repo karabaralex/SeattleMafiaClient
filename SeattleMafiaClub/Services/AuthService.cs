@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using Xamarin.Forms;
 
 namespace SeattleMafiaClub.Services
@@ -8,6 +9,7 @@ namespace SeattleMafiaClub.Services
         static AuthService instance = new AuthService();
 
         public Xamarin.Auth.OAuth2Authenticator authenticator;
+        private readonly object authLock = new object();
 
         public static AuthService getInstance()
         {
@@ -64,13 +66,18 @@ namespace SeattleMafiaClub.Services
                 clientId:"1965686263705363",
                 scope:"email",
                 authorizeUrl: new Uri("https://m.facebook.com/dialog/oauth/"),
+                //redirectUrl: new Uri("http://com.seattlemafiaclub.SeattleMafiaClub/oauth2redirect"));
                 redirectUrl: new Uri("http://www.facebook.com/connect/login_success.html"));
-            
+            System.Diagnostics.Debug.WriteLine("--- start auth");
             authenticator.Completed += (object s, Xamarin.Auth.AuthenticatorCompletedEventArgs e) => {
+                System.Diagnostics.Debug.WriteLine("--- auth completed:" + e.IsAuthenticated);
                 if (e.IsAuthenticated)
                 {
+                    setFacebookToken(e.Account);
+
                     // Do something
-                    queryUserInfo(e.Account, (bool obj) => OnCompletedListener(obj));
+                    //queryUserInfo(e.Account, (bool obj) => OnCompletedListener(obj));
+                    OnCompletedListener(true);
                 }
                 else
                 {
@@ -81,6 +88,7 @@ namespace SeattleMafiaClub.Services
 
             authenticator.Error += (object s, Xamarin.Auth.AuthenticatorErrorEventArgs e) =>
             {
+                System.Diagnostics.Debug.WriteLine("--- auth error:" + e.Message);
                 if (OnCompletedListener != null)
                     OnCompletedListener(false);
             };
@@ -90,28 +98,29 @@ namespace SeattleMafiaClub.Services
 
         public void queryUserInfo(Action<bool> callback)
         {
-            queryUserInfo(getFacebookToken(), callback);
-        }
-
-        private void queryUserInfo(Xamarin.Auth.Account account, Action<bool> callback)
-        {
-            var request = new Xamarin.Auth.OAuth2Request("GET", new Uri("https://graph.facebook.com/me"), null, account);
+            var request = new Xamarin.Auth.OAuth2Request("GET", new Uri("https://graph.facebook.com/me"), null, getFacebookToken());
 
             request.GetResponseAsync().ContinueWith(t => {
                 Device.BeginInvokeOnMainThread(() => {
+                    System.Diagnostics.Debug.WriteLine("--- auth result:" + t.IsFaulted);
                     if (t.IsFaulted)
                     {
                         callback(false);
                     }
                     else
                     {
-                        setFacebookToken(account);
                         callback(true);
                     }
                 });
             });
         }
 
+        public void forgetCredentials()
+        {
+            setFacebookToken(null);
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
         internal string getToken()
         {
             Xamarin.Auth.Account account = getFacebookToken();
@@ -120,6 +129,7 @@ namespace SeattleMafiaClub.Services
             return account.Properties["access_token"];
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private Xamarin.Auth.Account getFacebookToken()
         {
             Xamarin.Auth.Account a = new Xamarin.Auth.Account();
@@ -130,11 +140,13 @@ namespace SeattleMafiaClub.Services
             return a;
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private void setFacebookToken(Xamarin.Auth.Account token)
         {
             if (token == null)
             {
-                Application.Current.Properties.Remove("facebook_access_token");
+                Application.Current.Properties.Remove("access_token");
+                Application.Current.SavePropertiesAsync();
                 return;
             }
 

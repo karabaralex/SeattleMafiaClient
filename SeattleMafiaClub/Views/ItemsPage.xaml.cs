@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SeattleMafiaClub.Services;
+using SeattleMafiaClub.Views;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 
@@ -30,9 +31,9 @@ namespace SeattleMafiaClub
             ItemsListView.SelectedItem = null;
         }
 
-        async void AddItem_Clicked(object sender, EventArgs e)
+        async void SettingsItem_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new NewItemPage());
+            await Navigation.PushAsync(new SettingsPage());
         }
 
         protected override void OnAppearing()
