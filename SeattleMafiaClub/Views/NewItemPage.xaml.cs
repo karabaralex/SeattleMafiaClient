@@ -6,13 +6,13 @@ namespace SeattleMafiaClub
 {
     public partial class NewItemPage : ContentPage
     {
-        public Item Item { get; set; }
+        public Table Item { get; set; }
 
         public NewItemPage()
         {
             InitializeComponent();
 
-            Item = new Item
+            Item = new Table
             {
                 Status = "Item name",
                 Description = "This is an item description."

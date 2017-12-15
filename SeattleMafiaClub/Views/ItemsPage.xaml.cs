@@ -43,6 +43,12 @@ namespace SeattleMafiaClub
             if (viewModel.Items.Count == 0)
                 viewModel.LoadItemsCommand.Execute(null);
         }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            viewModel.Items.Clear();
+        }
     }
 }
 public class GoogleOAuthToken

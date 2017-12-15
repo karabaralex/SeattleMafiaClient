@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="SeattleMafiaClub.ItemDetailPage" Title="{Binding Title}">
-	<StackLayout Spacing="20" Padding="15">
-		<Label Text="{Binding Item.Item.Status}" FontSize="Medium" />
+	<StackLayout>
+        <Image 
+                                    Aspect="AspectFill" 
+                                    HeightRequest="150"
+                                    Source="{Binding Item.Item.Host.Picture}" />
+        <StackLayout Spacing="20" Padding="15">
+		<Label Text="{Binding Item.PlayerStatus}" FontSize="Medium" />
 		<Label Text="{Binding Item.Item.Description}" FontSize="Small" />
         <Label Text="{Binding Item.FullName}" FontSize="Small" />
+        <Button Text="{Binding ButtonTitle}" Command="{Binding LeaveJoinCommand}" />
+       </StackLayout>
 	</StackLayout>
 </ContentPage>

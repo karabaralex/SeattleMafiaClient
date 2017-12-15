@@ -9,10 +9,19 @@
 				<ListView.ItemTemplate>
 					<DataTemplate>
 						<ViewCell>
-							<StackLayout Padding="10">
-								<Label Text="{Binding Item.Description}" LineBreakMode="NoWrap" Style="{DynamicResource ListItemTextStyle}" FontSize="16" />
-								<Label Text="{Binding FullName}" LineBreakMode="NoWrap" Style="{DynamicResource ListItemDetailTextStyle}" FontSize="13" />
-							</StackLayout>
+                            <StackLayout Padding="10" Orientation="Horizontal">
+                                <Image 
+                                    Aspect="AspectFit" 
+                                    WidthRequest="50"
+                                    Source="{Binding Item.Host.Picture}" />
+
+                                <StackLayout Padding="10">                             
+                                    <Label Text="{Binding PlayerStatus}" Style="{DynamicResource ListItemTextStyle}" FontSize="16" />
+                                    <Label Text="{Binding GameStatus}" Style="{DynamicResource ListItemTextStyle}" FontSize="16" />
+    								<Label Text="{Binding Item.Description}" LineBreakMode="NoWrap" Style="{DynamicResource ListItemTextStyle}" FontSize="16" />
+    								<Label Text="{Binding FullName}" LineBreakMode="NoWrap" Style="{DynamicResource ListItemDetailTextStyle}" FontSize="13" />
+    							</StackLayout>
+                            </StackLayout>
 						</ViewCell>
 					</DataTemplate>
 				</ListView.ItemTemplate>

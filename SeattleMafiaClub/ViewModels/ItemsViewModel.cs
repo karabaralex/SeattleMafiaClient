@@ -2,27 +2,67 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
-
+using Plugin.Geolocator;
 using Xamarin.Forms;
+using Plugin.Permissions.Abstractions;
 
 namespace SeattleMafiaClub
 {
     public class ItemViewModel
     {
 
-        public ItemViewModel(Item item)
+        public ItemViewModel(Table item)
         {
             this.Item = item;
+            switch(item.PlayerStatusOnTable)
+            {
+                case PlayerStatusOnTable.QUEUED:
+                    PlayerStatus = "In queue";
+                    break;
+                default:
+                case PlayerStatusOnTable.NON_QUEUED:
+                    PlayerStatus = "";
+                    break;
+                case PlayerStatusOnTable.SEATED:
+                    PlayerStatus = "In the game";
+                    break;
+            }
         }
 
-        public Item Item { get; set; }
+        public Table Item { get; }
 
         public string FullName
         {
             get
             {
-                return this.Item.Host.FirstName + " " + this.Item.Host.LastName;
+                string fName = this.Item.Host.FirstName != null ? this.Item.Host.FirstName : "";
+                string sName = this.Item.Host.LastName != null ? this.Item.Host.LastName : "";
+                return fName + " " + sName;
             }
+        }
+
+        public string GameStatus
+        {
+            get
+            {
+                switch(Item.GameStatus)
+                {
+                    case GameStatusValue.PENDING_START:
+                        return "Pending";
+                    case GameStatusValue.IN_PROGRESS:
+                        return "In progress";
+                    case GameStatusValue.FINISHED:
+                        return "Finished";
+                    default:
+                    case GameStatusValue.NONE:
+                        return "";
+                }
+            }
+        }
+
+        public string PlayerStatus
+        {
+            get; set;
         }
     }
 
@@ -33,13 +73,13 @@ namespace SeattleMafiaClub
 
         public ItemsViewModel()
         {
-            Title = "Browse";
+            Title = "Games";
             Items = new ObservableCollection<ItemViewModel>();
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
 
-            MessagingCenter.Subscribe<NewItemPage, Item>(this, "AddItem", async (obj, item) =>
+            MessagingCenter.Subscribe<NewItemPage, Table>(this, "AddItem", async (obj, item) =>
             {
-                var _item = item as Item;
+                var _item = item as Table;
                 Items.Add(new ItemViewModel(_item));
                 await DataStore.AddItemAsync(_item);
             });
@@ -51,7 +91,6 @@ namespace SeattleMafiaClub
                 return;
 
             IsBusy = true;
-
             try
             {
                 Items.Clear();
@@ -60,10 +99,6 @@ namespace SeattleMafiaClub
                 {
                     Items.Add(new ItemViewModel(item));
                 }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
             }
             finally
             {

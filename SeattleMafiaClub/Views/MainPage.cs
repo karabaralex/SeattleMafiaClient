@@ -21,10 +21,7 @@ namespace SeattleMafiaClub
             switch (Device.RuntimePlatform)
             {
                 case Device.iOS:
-                    itemsPage = new NavigationPage(new ItemsPage())
-                    {
-                        Title = "Browse"
-                    };
+                    itemsPage = new NavigationPage(new ItemsPage());
 
                     aboutPage = new NavigationPage(new AboutPage())
                     {
@@ -34,10 +31,7 @@ namespace SeattleMafiaClub
                     aboutPage.Icon = "tab_about.png";
                     break;
                 default:
-                    itemsPage = new ItemsPage()
-                    {
-                        Title = "Browse"
-                    };
+                    itemsPage = new ItemsPage();
 
                     aboutPage = new AboutPage()
                     {
@@ -50,18 +44,6 @@ namespace SeattleMafiaClub
             Children.Add(aboutPage);
 
             Title = Children[0].Title;
-        }
-
-        //protected override void OnCurrentPageChanged()
-        //{
-        //    base.OnCurrentPageChanged();
-        //    Title = CurrentPage?.Title ?? string.Empty;
-        //}
-
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
-            //Navigation.PushAsync(new ItemsPage());
         }
     }
 }

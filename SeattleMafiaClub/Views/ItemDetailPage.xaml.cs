@@ -13,7 +13,7 @@ namespace SeattleMafiaClub
         {
             InitializeComponent();
 
-            var item = new Item
+            var item = new Table
             {
                 Status = "Item 1",
                 Description = "This is an item description."

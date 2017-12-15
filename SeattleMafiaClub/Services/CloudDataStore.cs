@@ -14,7 +14,6 @@ namespace SeattleMafiaClub
     public class CloudDataStore
     {
         HttpClient client;
-        IEnumerable<Item> items;
         private string requestProviderArg;
         private string token;
 
@@ -26,7 +25,6 @@ namespace SeattleMafiaClub
             client = new HttpClient();
             client.BaseAddress = new Uri($"{App.BackendUrl}/");
 
-            items = new List<Item>();
             setCredentials(PROVIDER_FACEBOOK, AuthService.getInstance().getToken());
             setLocation(new Location(47.87f, -122.31f));
         }
@@ -43,44 +41,109 @@ namespace SeattleMafiaClub
             this.location = location; 
         }
 
-        public async Task<IEnumerable<Item>> GetItemsAsync(bool forceRefresh = false)
+        public async Task<IEnumerable<Table>> GetItemsAsync(bool forceRefresh = false)
         {
             if (forceRefresh && CrossConnectivity.Current.IsConnected)
             {
-                var json = await client.GetStringAsync($"status/{this.location.latitude}/{this.location.longitude}/{this.requestProviderArg}/{this.token}");
-                items = await Task.Run(() =>
-                {
-                    JObject googleSearch = JObject.Parse(json);
-                    // get JSON result objects into a list
-                    IEnumerable<JToken> results = googleSearch["games"].Children();
-                    // serialize JSON results into .NET objects
-                    IList<Item> searchResults = new List<Item>();
-                    foreach (JToken result in results)
-                    {
-                        // JToken.ToObject is a helper method that uses JsonSerializer internally
-                        Item searchResult = result.ToObject<Item>();
-                        searchResults.Add(searchResult);
-                    }
-
-                    return searchResults;
-                });
+                var json = await client.GetStringAsync($"club-status/0/{this.requestProviderArg}/{this.token}");
+                return await parsePlayerStatus(json);
             }
 
-            return items;
+            return new List<Table>();
         }
 
-        public async Task<Item> GetItemAsync(string id)
+        private async Task<IEnumerable<Table>> parsePlayerStatus(string json)
+        {
+            return await Task.Run(() =>
+            {
+                IList<Table> searchResults = new List<Table>();
+                JObject response = JObject.Parse(json);
+
+                if (response["queued"] != null)
+                {
+                    foreach (JToken result in response["queued"].Children())
+                    {
+                        // JToken.ToObject is a helper method that uses JsonSerializer internally
+                        Table item = result["table"].ToObject<Table>();
+                        item.PlayerStatusOnTable = PlayerStatusOnTable.QUEUED;
+                        searchResults.Add(item);
+                    }
+                }
+
+                if (response["non-queued"] != null)
+                {
+                    foreach (JToken result in response["non-queued"].Children())
+                    {
+                        // JToken.ToObject is a helper method that uses JsonSerializer internally
+                        Table item = result.ToObject<Table>();
+                        item.PlayerStatusOnTable = PlayerStatusOnTable.NON_QUEUED;
+                        searchResults.Add(item);
+                    }
+                }
+
+                if (response["seated"] != null)
+                {
+                    //foreach (JToken result in response["seated"].Children())
+                    {
+                        // JToken.ToObject is a helper method that uses JsonSerializer internally
+                        Table item = response["seated"]["table"].ToObject<Table>();
+                        item.PlayerStatusOnTable = PlayerStatusOnTable.SEATED;
+                        searchResults.Add(item);
+                    }
+                }
+
+                return searchResults;
+            });
+        }
+
+        public async Task<Table> JoinGame(Table table)
+        {
+            if (table != null && CrossConnectivity.Current.IsConnected)
+            {
+                var json = await client.GetStringAsync($"join/{table.Id}/{this.requestProviderArg}/{this.token}");
+                IEnumerable<Table> results = await parsePlayerStatus(json);
+                foreach (Table resultTable in results)
+                {
+                    if (resultTable.Id.Equals(table.Id))
+                    {
+                        return resultTable;
+                    }
+                }
+            }
+
+            return table;
+        }
+
+        public async Task<Table> LeaveGame(Table table)
+        {
+            if (table != null && CrossConnectivity.Current.IsConnected)
+            {
+                var json = await client.GetStringAsync($"leave/{table.Id}/{this.requestProviderArg}/{this.token}");
+                IEnumerable<Table> results = await parsePlayerStatus(json);
+                foreach (Table resultTable in results)
+                {
+                    if (resultTable.Id.Equals(table.Id))
+                    {
+                        return resultTable;
+                    }
+                }
+            }
+
+            return table;
+        }
+
+        public async Task<Table> GetItemAsync(string id)
         {
             if (id != null && CrossConnectivity.Current.IsConnected)
             {
                 var json = await client.GetStringAsync($"api/item/{id}");
-                return await Task.Run(() => JsonConvert.DeserializeObject<Item>(json));
+                return await Task.Run(() => JsonConvert.DeserializeObject<Table>(json));
             }
 
             return null;
         }
 
-        public async Task<bool> AddItemAsync(Item item)
+        public async Task<bool> AddItemAsync(Table item)
         {
             if (item == null || !CrossConnectivity.Current.IsConnected)
                 return false;
@@ -92,7 +155,7 @@ namespace SeattleMafiaClub
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<bool> UpdateItemAsync(Item item)
+        public async Task<bool> UpdateItemAsync(Table item)
         {
             if (item == null || item.Id == null || !CrossConnectivity.Current.IsConnected)
                 return false;
